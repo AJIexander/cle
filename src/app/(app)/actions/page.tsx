@@ -120,14 +120,11 @@ export default function ActionsPage() {
           </Form>
 
           {result && (
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Terminal className="h-5 w-5" />
-                  Execution Result
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+            <div className="mt-6 space-y-2 rounded-lg border bg-card p-4">
+                <div className="flex items-center gap-2 font-semibold text-card-foreground">
+                    <Terminal className="h-5 w-5" />
+                    <h2>Execution Result</h2>
+                </div>
                 {result.stderr ? (
                   <div className="text-destructive">
                     <h3 className="font-semibold">Error:</h3>
@@ -143,8 +140,7 @@ export default function ActionsPage() {
                     </pre>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+            </div>
           )}
 
         </CardContent>
