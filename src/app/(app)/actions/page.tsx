@@ -12,8 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Play, HardDrive, Loader2, Terminal } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Play, HardDrive, Loader2, Terminal, FlaskConical } from "lucide-react";
 
 const formSchema = z.object({
   serverIp: z.string().min(1, "Please select a server."),
@@ -44,6 +43,8 @@ export default function ActionsPage() {
     setResult(response);
     setIsLoading(false);
   }
+  
+  const isSimulation = result?.stdout?.includes("[SIMULATION MODE]") || result?.stderr?.includes("[SIMULATION MODE]");
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
@@ -51,7 +52,7 @@ export default function ActionsPage() {
         <CardHeader>
           <CardTitle>Run Cleanup</CardTitle>
           <CardDescription>
-            Connect to a Windows server via WinRM to run a simulated cleanup script. Enter credentials to proceed.
+            Connect to a Windows server via WinRM to run a cleanup script. Enter credentials to proceed.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -122,15 +123,16 @@ export default function ActionsPage() {
 
           {result && (
             <div className="mt-6 space-y-2 rounded-lg border bg-card p-4">
-                <div className="flex items-center justify-between gap-2 font-semibold text-card-foreground">
-                    <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 font-semibold text-card-foreground">
                         <Terminal className="h-5 w-5" />
                         <h2>Execution Result</h2>
                     </div>
-                    {(result.stdout?.includes("[SIMULATION MODE]") || result.stderr?.includes("[SIMULATION MODE]")) && (
-                      <Badge variant="outline" className="border-yellow-500 text-yellow-500">
-                        Simulation Mode
-                      </Badge>
+                    {isSimulation && (
+                        <div className="flex items-center gap-1.5 rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">
+                            <FlaskConical className="h-3.5 w-3.5" />
+                            <span>Simulation Mode</span>
+                        </div>
                     )}
                 </div>
                 {result.stderr ? (

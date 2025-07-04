@@ -1,7 +1,6 @@
 "use server";
 
 import { z } from "zod";
-import { initialServers } from "@/lib/mock-data";
 
 const cleanupActionSchema = z.object({
   serverIp: z.string(),
@@ -11,10 +10,13 @@ const cleanupActionSchema = z.object({
 
 type CleanupActionInput = z.infer<typeof cleanupActionSchema>;
 
+function getCurrentTimestamp() {
+    return new Date().toISOString().replace('T', ' ').substring(0, 19);
+}
+
 /**
- * SIMULATED cleanup script execution.
- * This simulates connecting to a server and running cleanup tasks.
- * The actual `node-winrm` package could not be installed due to network/environment issues.
+ * Simulates running a cleanup script on a remote Windows server.
+ * This is a placeholder until a WinRM package can be successfully installed.
  */
 export async function runCleanupAction(input: CleanupActionInput): Promise<{ stdout?: string; stderr?: string }> {
   const validation = cleanupActionSchema.safeParse(input);
@@ -24,47 +26,39 @@ export async function runCleanupAction(input: CleanupActionInput): Promise<{ std
 
   const { serverIp, username, password } = input;
 
-  // Simulate authentication failure
+  if (serverIp === "192.168.1.100") {
+      const errorMsg = `${getCurrentTimestamp()} - [SIMULATION MODE] Error: Connection to ${serverIp} failed. The server appears to be offline.`;
+      return { stderr: errorMsg };
+  }
+
   if (!password) {
-    return { stderr: "[SIMULATION MODE] Authentication failed. Password cannot be empty." };
+    const errorMsg = `${getCurrentTimestamp()} - [SIMULATION MODE] Error: Authentication failed for user '${username}'. Password cannot be empty.`;
+    return { stderr: errorMsg };
   }
   
-  // Find server to check its status from the mock data, as we can't fetch it live.
-  const server = initialServers.find(s => s.ipAddress === serverIp);
+  // Simulate a delay
+  await new Promise(resolve => setTimeout(resolve, 1500));
 
-  // Simulate connection failure for offline servers
-  if (server && server.status === 'Offline') {
-    return { stderr: `[SIMULATION MODE] Network error connecting to ${serverIp}:5985. Server is offline.` };
-  }
+  const freedWindowsTemp = (Math.random() * 500 + 100).toFixed(2);
+  const freedUserTemp = (Math.random() * 200 + 50).toFixed(2);
+  const freedDownloads = (Math.random() * 5000 + 1000).toFixed(2);
+  const totalFreed = ((parseFloat(freedWindowsTemp) + parseFloat(freedUserTemp) + parseFloat(freedDownloads)) / 1024).toFixed(2);
 
-  // Simulate a successful execution with dynamic output
-  const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
-  const freedWinTemp = (Math.random() * 500).toFixed(2);
-  const freedUserTemp = (Math.random() * 200).toFixed(2);
-  const freedDownloads = (Math.random() * 5000).toFixed(2);
-  const totalFreed = ((parseFloat(freedWinTemp) + parseFloat(freedUserTemp) + parseFloat(freedDownloads)) / 1024).toFixed(2);
+  const output = [
+    `${getCurrentTimestamp()} - [SIMULATION MODE] Starting simulated cleanup operation on server at ${serverIp}.`,
+    `${getCurrentTimestamp()} - [SIMULATION MODE] Authenticated as user: ${username}.`,
+    `${getCurrentTimestamp()} - [SIMULATION MODE] Cleaning Windows temp folder...`,
+    `${getCurrentTimestamp()} - [SIMULATION MODE] Cleaning User temp folder...`,
+    `${getCurrentTimestamp()} - [SIMULATION MODE] Cleaning files older than 30 days from Downloads...`,
+    `${getCurrentTimestamp()} - [SIMULATION MODE] --------------------------------------------------`,
+    `${getCurrentTimestamp()} - [SIMULATION MODE] CLEANUP SUMMARY`,
+    `${getCurrentTimestamp()} - [SIMULATION MODE] Space freed from Windows Temp: ${freedWindowsTemp} MB`,
+    `${getCurrentTimestamp()} - [SIMULATION MODE] Space freed from User Temp: ${freedUserTemp} MB`,
+    `${getCurrentTimestamp()} - [SIMULATION MODE] Space freed from Downloads: ${freedDownloads} MB`,
+    `${getCurrentTimestamp()} - [SIMULATION MODE] Total space freed: ${totalFreed} GB.`,
+    `${getCurrentTimestamp()} - [SIMULATION MODE] Cleanup completed successfully.`,
+    `${getCurrentTimestamp()} - [SIMULATION MODE] --------------------------------------------------`,
+  ].join('\n');
 
-  const stdout = `
-[SIMULATION MODE] - This is not a real execution.
-
-${now} - Starting simulated cleanup on server ${serverIp}.
-${now} - Authenticating user: ${username}.
-${now} - Cleaning Windows system temp folder...
-${now} - Cleaning user temp folder...
-${now} - Cleaning files older than 30 days from Downloads folder...
-${now} - --------------------------------------------------
-${now} - CLEANUP SUMMARY
-${now} - Freed in Windows Temp: ${freedWinTemp} MB
-${now} - Freed in User Temp: ${freedUserTemp} MB
-${now} - Freed in Downloads: ${freedDownloads} MB
-${now} - Total space freed: ${totalFreed} GB.
-${now} - Cleanup completed successfully.
-${now} - --------------------------------------------------
-  `.trim();
-
-  return new Promise((resolve) => {
-    setTimeout(() => {
-        resolve({ stdout: stdout, stderr: "" });
-    }, 1500); // Simulate network and script execution delay
-  });
+  return { stdout: output };
 }
