@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Play, HardDrive, Loader2, Terminal, FlaskConical } from "lucide-react";
+import { Play, HardDrive, Loader2, Terminal, Beaker } from "lucide-react";
 
 const formSchema = z.object({
   serverIp: z.string().min(1, "Please select a server."),
@@ -43,8 +43,6 @@ export default function ActionsPage() {
     setResult(response);
     setIsLoading(false);
   }
-  
-  const isSimulation = result?.stdout?.includes("[SIMULATION MODE]") || result?.stderr?.includes("[SIMULATION MODE]");
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
@@ -123,33 +121,33 @@ export default function ActionsPage() {
 
           {result && (
             <div className="mt-6 space-y-2 rounded-lg border bg-card p-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 font-semibold text-card-foreground">
-                        <Terminal className="h-5 w-5" />
-                        <h2>Execution Result</h2>
-                    </div>
-                    {isSimulation && (
-                        <div className="flex items-center gap-1.5 rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">
-                            <FlaskConical className="h-3.5 w-3.5" />
-                            <span>Simulation Mode</span>
-                        </div>
-                    )}
+              <div className="flex items-center justify-between gap-2 font-semibold text-card-foreground">
+                <div className="flex items-center gap-2">
+                  <Terminal className="h-5 w-5" />
+                  <h2>Execution Result</h2>
                 </div>
-                {result.stderr ? (
-                  <div className="text-destructive">
-                    <h3 className="font-semibold">Error:</h3>
-                    <pre className="mt-2 whitespace-pre-wrap rounded-md bg-destructive/10 p-4 font-mono text-sm">
-                      {result.stderr}
-                    </pre>
-                  </div>
-                ) : (
-                   <div className="text-foreground">
-                    <h3 className="font-semibold">Output:</h3>
-                    <pre className="mt-2 whitespace-pre-wrap rounded-md bg-muted p-4 font-mono text-sm">
-                      {result.stdout || "No output received."}
-                    </pre>
+                {result.stdout?.includes("[SIMULATION MODE]") && (
+                  <div className="flex items-center gap-2 text-xs text-amber-500 font-medium">
+                    <Beaker className="h-4 w-4" />
+                    <span>Simulation Mode</span>
                   </div>
                 )}
+              </div>
+              {result.stderr ? (
+                <div className="text-destructive">
+                  <h3 className="font-semibold">Error:</h3>
+                  <pre className="mt-2 whitespace-pre-wrap rounded-md bg-destructive/10 p-4 font-mono text-sm">
+                    {result.stderr}
+                  </pre>
+                </div>
+              ) : (
+                 <div className="text-foreground">
+                  <h3 className="font-semibold">Output:</h3>
+                  <pre className="mt-2 whitespace-pre-wrap rounded-md bg-muted p-4 font-mono text-sm">
+                    {result.stdout || "No output received."}
+                  </pre>
+                </div>
+              )}
             </div>
           )}
 

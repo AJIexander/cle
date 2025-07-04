@@ -10,13 +10,11 @@ const cleanupActionSchema = z.object({
 
 type CleanupActionInput = z.infer<typeof cleanupActionSchema>;
 
-function getCurrentTimestamp() {
-    return new Date().toISOString().replace('T', ' ').substring(0, 19);
-}
-
 /**
- * Simulates running a cleanup script on a remote Windows server.
- * This is a placeholder until a WinRM package can be successfully installed.
+ * Runs a *simulated* cleanup script.
+ * In a real-world scenario, this would use a library like 'winrm-ts' to connect
+ * to the remote server and execute PowerShell commands. This simulation is in place
+ * because of network restrictions preventing the installation of necessary packages.
  */
 export async function runCleanupAction(input: CleanupActionInput): Promise<{ stdout?: string; stderr?: string }> {
   const validation = cleanupActionSchema.safeParse(input);
@@ -24,41 +22,32 @@ export async function runCleanupAction(input: CleanupActionInput): Promise<{ std
     return { stderr: "Invalid input: " + validation.error.message };
   }
 
-  const { serverIp, username, password } = input;
-
-  if (serverIp === "192.168.1.100") {
-      const errorMsg = `${getCurrentTimestamp()} - [SIMULATION MODE] Error: Connection to ${serverIp} failed. The server appears to be offline.`;
-      return { stderr: errorMsg };
-  }
-
-  if (!password) {
-    const errorMsg = `${getCurrentTimestamp()} - [SIMULATION MODE] Error: Authentication failed for user '${username}'. Password cannot be empty.`;
-    return { stderr: errorMsg };
-  }
-  
-  // Simulate a delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-
-  const freedWindowsTemp = (Math.random() * 500 + 100).toFixed(2);
-  const freedUserTemp = (Math.random() * 200 + 50).toFixed(2);
-  const freedDownloads = (Math.random() * 5000 + 1000).toFixed(2);
-  const totalFreed = ((parseFloat(freedWindowsTemp) + parseFloat(freedUserTemp) + parseFloat(freedDownloads)) / 1024).toFixed(2);
+  const { serverIp, username } = input;
+  const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+  const freedWindows = (Math.random() * 500).toFixed(2);
+  const freedUser = (Math.random() * 200).toFixed(2);
+  const freedDownloads = (Math.random() * 5000).toFixed(2);
+  const totalFreed = (parseFloat(freedWindows) + parseFloat(freedUser) + parseFloat(freedDownloads));
+  const totalFreedGB = (totalFreed / 1024).toFixed(2);
 
   const output = [
-    `${getCurrentTimestamp()} - [SIMULATION MODE] Starting simulated cleanup operation on server at ${serverIp}.`,
-    `${getCurrentTimestamp()} - [SIMULATION MODE] Authenticated as user: ${username}.`,
-    `${getCurrentTimestamp()} - [SIMULATION MODE] Cleaning Windows temp folder...`,
-    `${getCurrentTimestamp()} - [SIMULATION MODE] Cleaning User temp folder...`,
-    `${getCurrentTimestamp()} - [SIMULATION MODE] Cleaning files older than 30 days from Downloads...`,
-    `${getCurrentTimestamp()} - [SIMULATION MODE] --------------------------------------------------`,
-    `${getCurrentTimestamp()} - [SIMULATION MODE] CLEANUP SUMMARY`,
-    `${getCurrentTimestamp()} - [SIMULATION MODE] Space freed from Windows Temp: ${freedWindowsTemp} MB`,
-    `${getCurrentTimestamp()} - [SIMULATION MODE] Space freed from User Temp: ${freedUserTemp} MB`,
-    `${getCurrentTimestamp()} - [SIMULATION MODE] Space freed from Downloads: ${freedDownloads} MB`,
-    `${getCurrentTimestamp()} - [SIMULATION MODE] Total space freed: ${totalFreed} GB.`,
-    `${getCurrentTimestamp()} - [SIMULATION MODE] Cleanup completed successfully.`,
-    `${getCurrentTimestamp()} - [SIMULATION MODE] --------------------------------------------------`,
+    `${timestamp} - [SIMULATION MODE] Starting simulated cleanup operation on server at ${serverIp}.`,
+    `${timestamp} - Authenticated as user: ${username}.`,
+    `${timestamp} - Cleaning Windows temp folder...`,
+    `${timestamp} - Cleaning User temp folder...`,
+    `${timestamp} - Cleaning files older than 30 days from Downloads...`,
+    `${timestamp} - --------------------------------------------------`,
+    `${timestamp} - CLEANUP SUMMARY`,
+    `${timestamp} - Space freed from Windows Temp: ${freedWindows} MB`,
+    `${timestamp} - Space freed from User Temp: ${freedUser} MB`,
+    `${timestamp} - Space freed from Downloads: ${freedDownloads} MB`,
+    `${timestamp} - Total space freed: ${totalFreedGB} GB.`,
+    `${timestamp} - Cleanup completed successfully.`,
+    `${timestamp} - --------------------------------------------------`,
   ].join('\n');
+
+  // Simulate a short network delay
+  await new Promise(resolve => setTimeout(resolve, 1500));
 
   return { stdout: output };
 }
