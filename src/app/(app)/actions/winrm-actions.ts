@@ -19,14 +19,14 @@ type CleanupActionInput = z.infer<typeof cleanupActionSchema>;
 export async function runCleanupAction(input: CleanupActionInput): Promise<{ stdout?: string; stderr?: string }> {
   const validation = cleanupActionSchema.safeParse(input);
   if (!validation.success) {
-    return { stderr: "Неверные входные данные: " + validation.error.message };
+    return { stderr: "Invalid input: " + validation.error.message };
   }
 
   const { serverIp, username, password } = input;
 
   // Simulate authentication failure
   if (!password) {
-    return { stderr: "Аутентификация не удалась. Пароль не может быть пустым." };
+    return { stderr: "Authentication failed. Password cannot be empty." };
   }
   
   // Find server to check its status from the mock data, as we can't fetch it live.
@@ -34,7 +34,7 @@ export async function runCleanupAction(input: CleanupActionInput): Promise<{ std
 
   // Simulate connection failure for offline servers
   if (server && server.status === 'Offline') {
-    return { stderr: `[РЕЖИМ СИМУЛЯЦИИ] Сетевая ошибка при подключении к ${serverIp}:5985. Сервер оффлайн.` };
+    return { stderr: `[SIMULATION MODE] Network error connecting to ${serverIp}:5985. Server is offline.` };
   }
 
   // Simulate a successful execution with dynamic output
@@ -45,20 +45,20 @@ export async function runCleanupAction(input: CleanupActionInput): Promise<{ std
   const totalFreed = ((parseFloat(freedWinTemp) + parseFloat(freedUserTemp) + parseFloat(freedDownloads)) / 1024).toFixed(2);
 
   const stdout = `
-[РЕЖИМ СИМУЛЯЦИИ] - Это не настоящее выполнение.
+[SIMULATION MODE] - This is not a real execution.
 
-${now} - Запуск симуляции очистки на сервере ${serverIp}.
-${now} - Аутентификация пользователя: ${username}.
-${now} - Очистка системной временной папки Windows...
-${now} - Очистка временной папки пользователя...
-${now} - Очистка файлов старше 30 дней из папки "Загрузки"...
+${now} - Starting simulated cleanup on server ${serverIp}.
+${now} - Authenticating user: ${username}.
+${now} - Cleaning Windows system temp folder...
+${now} - Cleaning user temp folder...
+${now} - Cleaning files older than 30 days from Downloads folder...
 ${now} - --------------------------------------------------
-${now} - ИТОГИ ОЧИСТКИ
-${now} - Освобождено в Windows Temp: ${freedWinTemp} МБ
-${now} - Освобождено в User Temp: ${freedUserTemp} МБ
-${now} - Освобождено в Загрузках: ${freedDownloads} МБ
-${now} - Всего освобождено: ${totalFreed} ГБ.
-${now} - Очистка успешно завершена.
+${now} - CLEANUP SUMMARY
+${now} - Freed in Windows Temp: ${freedWinTemp} MB
+${now} - Freed in User Temp: ${freedUserTemp} MB
+${now} - Freed in Downloads: ${freedDownloads} MB
+${now} - Total space freed: ${totalFreed} GB.
+${now} - Cleanup completed successfully.
 ${now} - --------------------------------------------------
   `.trim();
 

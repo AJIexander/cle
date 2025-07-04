@@ -127,7 +127,7 @@ export default function ActionsPage() {
                         <Terminal className="h-5 w-5" />
                         <h2>Execution Result</h2>
                     </div>
-                    {result.stdout?.includes("[РЕЖИМ СИМУЛЯЦИИ]") && (
+                    {result.stdout?.includes("[SIMULATION MODE]") && (
                       <Badge variant="outline" className="border-yellow-500 text-yellow-500">
                         Simulation Mode
                       </Badge>
