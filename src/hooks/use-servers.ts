@@ -17,30 +17,34 @@ export function useServers() {
       if (storedServers) {
         loadedServers = JSON.parse(storedServers);
       } else {
-        // Set initial data if nothing is in localStorage
         loadedServers = initialServers;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(initialServers));
       }
       
-      // Simulate live status check on load
       const updatedServersWithStatus = loadedServers.map(server => {
-        if (server.ipAddress === '192.168.1.100') { // Keep backup server offline
+        if (server.ipAddress === '192.168.1.100') {
           return { ...server, status: 'Offline' };
         }
-        // Give other servers a random chance to be "offline" to simulate network issues
-        const isOnline = Math.random() > 0.1; // 90% chance to be online
+        const isOnline = Math.random() > 0.1;
         const originalStatus = server.status;
         const newStatus = isOnline ? 'Online' : 'Offline';
         
-        // If status changes, use the new one, otherwise respect warning/other states
-        return { ...server, status: originalStatus === 'Warning' ? 'Warning' : newStatus };
+        const usagePercent = (server.usedDisk / server.totalDisk) * 100;
+        let finalStatus: Server['status'] = newStatus;
+        if (newStatus === 'Online' && usagePercent > 85) {
+            finalStatus = 'Warning';
+        } else if (newStatus === 'Online') {
+            finalStatus = 'Online';
+        }
+
+        return { ...server, status: finalStatus };
       });
 
       setServers(updatedServersWithStatus);
 
     } catch (error) {
       console.error("Failed to load servers from localStorage", error);
-      setServers(initialServers); // Fallback to initial data
+      setServers(initialServers); 
     }
     setIsLoaded(true);
   }, []);
@@ -54,12 +58,17 @@ export function useServers() {
     }
   };
 
-  const addServer = (server: Omit<Server, 'id' | 'status'>) => {
-    // Let's create a more unique ID and default status
-    const newServer: Server = { 
-        ...server, 
+  const addServer = (server: { name: string; ipAddress: string; totalDisk: number; usedDisk: number }) => {
+    const usagePercent = (server.usedDisk / server.totalDisk) * 100;
+    const status: Server['status'] = usagePercent > 85 ? 'Warning' : 'Online';
+    
+    const newServer: Server = {
         id: `srv-${new Date().getTime()}-${Math.random().toString(36).substring(2, 7)}`,
-        status: 'Online' 
+        status: status,
+        name: server.name,
+        ipAddress: server.ipAddress,
+        totalDisk: server.totalDisk,
+        usedDisk: server.usedDisk,
     };
     const updatedServers = [...servers, newServer];
     updateStorage(updatedServers);

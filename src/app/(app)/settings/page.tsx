@@ -16,9 +16,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const serverSchema = z.object({
   name: z.string().min(1, "Server name is required."),
-  ipAddress: z.string().min(1, "IP address is required."), // Simplified validation for now
-  totalDisk: z.coerce.number().min(1, "Total disk size is required."),
-  usedDisk: z.coerce.number().min(0, "Used disk cannot be negative."),
+  ipAddress: z.string().min(1, "IP address is required.").refine(val => {
+    const parts = val.split('.');
+    return parts.length === 4 && parts.every(part => {
+      const num = parseInt(part, 10);
+      return !isNaN(num) && num >= 0 && num <= 255;
+    });
+  }, "Please enter a valid IPv4 address."),
+  totalDisk: z.coerce.number().positive("Total disk must be a positive number."),
+  usedDisk: z.coerce.number().nonnegative("Used disk must be a non-negative number."),
 }).refine(data => data.usedDisk <= data.totalDisk, {
   message: "Used disk cannot be greater than total disk.",
   path: ["usedDisk"],
@@ -35,16 +41,16 @@ export default function SettingsPage() {
     defaultValues: {
       name: "",
       ipAddress: "",
-      totalDisk: 0,
-      usedDisk: 0,
+      totalDisk: 100,
+      usedDisk: 50,
     },
   });
 
   function onSubmit(values: ServerFormValues) {
-    addServer({ ...values, status: 'Online' }); // Default status to Online
+    addServer(values);
     toast({
       title: "Server Added",
-      description: `Server "${values.name}" has been successfully added.`,
+      description: `Server "${values.name}" has been added.`,
     });
     form.reset();
   }
@@ -97,31 +103,31 @@ export default function SettingsPage() {
                 )}
               />
               <div className="grid grid-cols-2 gap-4">
-                <FormField
-                    control={form.control}
-                    name="totalDisk"
-                    render={({ field }) => (
+                 <FormField
+                  control={form.control}
+                  name="totalDisk"
+                  render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Total Disk (GB)</FormLabel>
-                        <FormControl>
-                        <Input type="number" placeholder="500" {...field} />
-                        </FormControl>
-                        <FormMessage />
+                      <FormLabel>Total Disk (GB)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="100" {...field} />
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
-                    )}
+                  )}
                 />
-                <FormField
-                    control={form.control}
-                    name="usedDisk"
-                    render={({ field }) => (
+                 <FormField
+                  control={form.control}
+                  name="usedDisk"
+                  render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Used Disk (GB)</FormLabel>
-                        <FormControl>
-                        <Input type="number" placeholder="150" {...field} />
-                        </FormControl>
-                        <FormMessage />
+                      <FormLabel>Used Disk (GB)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="50" {...field} />
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
-                    )}
+                  )}
                 />
               </div>
               <Button type="submit">

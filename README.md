@@ -1,11 +1,15 @@
 # Server Sentinel
 
-This is a Next.js application designed to run on a server for monitoring and management tasks, featuring cloud-based AI via Google Gemini to provide powerful recommendations.
+This is a Next.js application designed to run on a server for monitoring and management tasks, featuring cloud-based AI via Ollama to provide powerful recommendations.
 
 ## Prerequisites
 
 1.  **Node.js:** Install Node.js (v18 or newer). You can download it from the [official website](https://nodejs.org/). This includes `npm`.
 2.  **Git:** Install Git to download the project files. You can get it from [git-scm.com](https://git-scm.com/).
+3.  **Ollama:** This project uses Ollama for local AI. Please [download and install Ollama](https://ollama.com/) and ensure it is running. After installation, pull the required model by running:
+    ```bash
+    ollama pull llama3
+    ```
 
 ## Setup and Installation
 
@@ -26,7 +30,7 @@ This is a Next.js application designed to run on a server for monitoring and man
 
 ## Running the Application
 
-A convenience script `start-server.bat` is provided to launch all necessary services.
+A convenience script `start-server.bat` is provided to launch all necessary services. Before running it, ensure Ollama is running in the background.
 
 Simply double-click `start-server.bat` or run it from the Command Prompt in the project's root directory:
 ```cmd
