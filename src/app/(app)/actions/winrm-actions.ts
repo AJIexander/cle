@@ -26,7 +26,7 @@ export async function runCleanupAction(input: CleanupActionInput): Promise<{ std
 
   // Simulate authentication failure
   if (!password) {
-    return { stderr: "Authentication failed. Password cannot be empty." };
+    return { stderr: "[SIMULATION MODE] Authentication failed. Password cannot be empty." };
   }
   
   // Find server to check its status from the mock data, as we can't fetch it live.
