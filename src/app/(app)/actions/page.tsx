@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { Play, HardDrive, Loader2, Terminal, Beaker } from "lucide-react";
 
 const formSchema = z.object({
@@ -120,34 +121,38 @@ export default function ActionsPage() {
           </Form>
 
           {result && (
-            <div className="mt-6 space-y-2 rounded-lg border bg-card p-4">
-              <div className="flex items-center justify-between gap-2 font-semibold text-card-foreground">
-                <div className="flex items-center gap-2">
-                  <Terminal className="h-5 w-5" />
-                  <h2>Execution Result</h2>
-                </div>
-                {result.stdout?.includes("[SIMULATION MODE]") && (
-                  <div className="flex items-center gap-2 text-xs text-amber-500 font-medium">
-                    <Beaker className="h-4 w-4" />
-                    <span>Simulation Mode</span>
-                  </div>
-                )}
-              </div>
-              {result.stderr ? (
-                <div className="text-destructive">
-                  <h3 className="font-semibold">Error:</h3>
-                  <pre className="mt-2 whitespace-pre-wrap rounded-md bg-destructive/10 p-4 font-mono text-sm">
-                    {result.stderr}
-                  </pre>
-                </div>
-              ) : (
-                 <div className="text-foreground">
-                  <h3 className="font-semibold">Output:</h3>
-                  <pre className="mt-2 whitespace-pre-wrap rounded-md bg-muted p-4 font-mono text-sm">
-                    {result.stdout || "No output received."}
-                  </pre>
-                </div>
-              )}
+            <div className="mt-6">
+                <Card>
+                    <CardHeader className="flex-row items-center justify-between pb-4">
+                        <div className="flex items-center gap-3">
+                            <Terminal className="h-5 w-5" />
+                            <CardTitle className="text-xl leading-none">Execution Result</CardTitle>
+                        </div>
+                        {result.stdout?.includes("[SIMULATION MODE]") && (
+                             <Badge variant="outline" className="border-amber-500/50 bg-amber-500/10 text-amber-500">
+                                <Beaker className="mr-2 h-4 w-4" />
+                                Simulation Mode
+                            </Badge>
+                        )}
+                    </CardHeader>
+                    <CardContent>
+                        {result.stderr ? (
+                            <div className="text-destructive">
+                                <h3 className="font-semibold">Error:</h3>
+                                <pre className="mt-2 whitespace-pre-wrap rounded-md bg-destructive/10 p-4 font-mono text-sm">
+                                    {result.stderr}
+                                </pre>
+                            </div>
+                        ) : (
+                            <div className="text-foreground">
+                                <h3 className="font-semibold">Output:</h3>
+                                <pre className="mt-2 whitespace-pre-wrap rounded-md bg-muted p-4 font-mono text-sm">
+                                    {result.stdout || "No output received."}
+                                </pre>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
             </div>
           )}
 
