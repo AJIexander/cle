@@ -42,6 +42,8 @@ export async function runCleanupAction(input: CleanupActionInput): Promise<{ std
   const downloadsFreed = (parseFloat(freedSpace) * 1024 - parseFloat(winTempFreed) - parseFloat(userTempFreed)).toFixed(2);
   
   const stdout = `
+[РЕЖИМ СИМУЛЯЦИИ] - Реальное подключение не выполнялось.
+--------------------------------------------------
 ${timestamp} - Starting simulated cleanup operation on server at ${serverIp}.
 ${timestamp} - Authenticated as user: ${username}.
 ${timestamp} - Cleaning Windows temp folder...

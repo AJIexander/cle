@@ -13,6 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Play, HardDrive, Loader2, Terminal } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const formSchema = z.object({
   serverIp: z.string().min(1, "Please select a server."),
@@ -121,9 +122,16 @@ export default function ActionsPage() {
 
           {result && (
             <div className="mt-6 space-y-2 rounded-lg border bg-card p-4">
-                <div className="flex items-center gap-2 font-semibold text-card-foreground">
-                    <Terminal className="h-5 w-5" />
-                    <h2>Execution Result</h2>
+                <div className="flex items-center justify-between gap-2 font-semibold text-card-foreground">
+                    <div className="flex items-center gap-2">
+                        <Terminal className="h-5 w-5" />
+                        <h2>Execution Result</h2>
+                    </div>
+                    {result.stdout?.includes("СИМУЛЯЦИИ") && (
+                      <Badge variant="outline" className="border-yellow-500 text-yellow-500">
+                        Simulation Mode
+                      </Badge>
+                    )}
                 </div>
                 {result.stderr ? (
                   <div className="text-destructive">
