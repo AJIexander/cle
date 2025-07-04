@@ -67,7 +67,7 @@ export default function ActionsPage() {
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a server to connect to" />
-                        </SelectTrigger>
+                        </Trigger>
                       </FormControl>
                       <SelectContent>
                         {servers
@@ -127,7 +127,7 @@ export default function ActionsPage() {
                         <Terminal className="h-5 w-5" />
                         <h2>Execution Result</h2>
                     </div>
-                    {result.stdout?.includes("СИМУЛЯЦИИ") && (
+                    {result.stdout?.includes("[РЕЖИМ СИМУЛЯЦИИ]") && (
                       <Badge variant="outline" className="border-yellow-500 text-yellow-500">
                         Simulation Mode
                       </Badge>
